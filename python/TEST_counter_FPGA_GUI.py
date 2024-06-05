@@ -37,6 +37,7 @@ list3 = []
 runcount = 0 
 file = "exporteddata.csv"
 printing = True
+counter1State = False
 # Stop querying the timestamp function, close device and initiate selected device in pairs mode.
 def InitDevice(*args):
     loop_flag.set(False)
@@ -126,7 +127,10 @@ c103_yar = [0]
 # Updates the graphs with new values, resizes the axes every loop. The x-axis is the UTC time in milliseconds since the epoch.
 def animate(i):
     xar.append(int(round(time.time() * 1000)))
-    c00_yar.append(float(counter_00.get()))
+    if counter1State==True:
+        c00_yar.append(float(counter_00.get()))
+    else:
+        c00_yar.append(0)
     c01_yar.append(float(counter_01.get()))
     c02_yar.append(float(counter_02.get()))
     c03_yar.append(float(counter_03.get()))
@@ -236,6 +240,7 @@ fig.legend(['C1', 'C2', 'C3', 'C4','P13','P14','P23','P24'], loc='upper right')
 fig.suptitle('Counts (TTL) vs Current Time')
 ax.set_xlabel('Time')
 ax.set_ylabel('Counts')
+ax.grid(True)
 ani = animation.FuncAnimation(fig, animate, interval=100, blit=False)
 
 # buttons
@@ -258,7 +263,7 @@ time_entry = Spinbox(mainframe, width=7, from_=0.1, to=5,
 angle_entry = Spinbox(mainframe, width=7, from_=0, to=360, increment=1, textvariable=angle)
 angle_entry.grid(column=5, row=7, sticky=(W, E))
 time_entry.grid(column=2, row=6, sticky=(W, E))
-timer_00.set(1000)
+timer_00.set(250)
 if printing == True:
     print(timer_00.get())
 
