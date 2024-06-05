@@ -1,0 +1,45 @@
+https://github.com/s-fifteen-instruments/Timestamp_TDC1/wiki/TDC1-Documentation
+
+Open timestamp_FPGA.py and manually edit line 26 to set the variable signal_type.
+  Use 'ttl' for the Thorlabs detectors.  (TTL = Transistor-Transistor Logic)
+  Use 'nim' for the S-15 detectors.  (NIM =  Nuclear Instrumentation Module)
+
+Open usbcount_class.py and manually edit line 19 to set the device variable.
+  This will be one of the COM ports corresponding to the USB port the blue timing device is plugged into.
+  To find which one, open the Windows Device Manager as follows:
+    Right click on the Windows Start icon (lower left corner).
+    Select Device Manager and log in.
+    Select Ports (COM & LPT) to see a drop-down menu of ports in use.
+    Find where the blue timing device's USB is plugged into the computer and pull it out.
+    You should see the list of ports update, revealing the one you unplugged.
+    Now plug it back it (duh) and set the device variable to corresponding COM port.
+    It's usually 'COM4' or 'COM6'.
+
+Double click on counter_FPGA_GUI or run "python counter_FPGA_GUI.py" in the Anaconda Command window
+  Use the drop-down menu at the top to select the COM port you're using and hit Init Device.
+  If you change the integration time, hit Set Gate Time.  (This can be done on the fly.)
+  It's just a GUI display - no data will be recorded.
+
+Double click on timestamp_FPGA or run "python timestamp_FPGA.py" in the Anaconda Command window
+  Use the drop-down menu at the top to select the COM port you're using and hit Init Device.
+    In the Command window you should see a text message indicating the selected port and integration time.
+
+If you click Start you'll see an evolving graph tracking the number of counts on each detector.
+  The Gate Time (in ms) specifies the time over which the counts are integrated for display.
+    So, setting it to 1000 shows the number of counts per second.
+  The Coincidence Window (in ns) specifies the time interval over which two detections are displayed as coincident.
+  The GUI won't show channels 3 or 4, but they will be recorded.
+  If the light is too bright, the detector will saturate and show no counts!
+  It will also show the number of pair-wise coincidences, based on the specified Coincidence Window.
+  There is also a running tally output to the Command window.
+  If you click on Record? it will output the raw timestamp data to a text file called Timeevents.txt
+    Each row is a five-bit binary number, a space, and a larger decimal number.
+    The binary number shows which detector(s) clicked, and the decimal number shows the time.
+    The right-most bit is channel 1.  The next the left is channel 2, etc.
+    The left-most bit is flag.  (0 = okay, 1 = invalid)
+    The decimal number is a running time counter, a 27-bit integer with units of ns (nanoseconds).
+    The counter "rolls over" after going past 999,999,999.
+    The data file is written when you hit Stop.  (It will write over whatever was there before.)
+  The timing device can handle up to about 2 million events per second before saturating.
+    
+  

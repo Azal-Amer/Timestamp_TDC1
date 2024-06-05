@@ -16,7 +16,7 @@ class FPGA_counter(serial_device.SerialDevice):
     def __init__(self, device: object = None) -> object:
         if device is None:
             try:
-                device = 'COM1'
+                device = 'COM3'
                 #'/dev/ttyS2'   # set correct serial address, note the difference in Windows and Unix environment.
                 # In Windows it is usually COM(x), in MAC /dev/tty.usbmodemTDC1..., in Ubuntu /dev/serial/by-id/usb-S-Fifteen_Instruments.......
                 # In Linux, the path changes quite often and it is easier to just check the path by id, note line above
@@ -82,7 +82,10 @@ class FPGA_counter(serial_device.SerialDevice):
     """ Functions for the counter mode"""
     @property
     def int_time(self):
-        self._int_time = int(self._getresponse('TIME?')[0].decode().strip())
+        temp = self._getresponse('TIME?')
+        while (len(temp) < 1):
+            temp = self._getresponse('TIME?')
+        self._int_time = int(temp[0].decode().strip())
         return self._int_time
 
     @int_time.setter
@@ -100,7 +103,9 @@ class FPGA_counter(serial_device.SerialDevice):
             return -1
         self.write('counts?\n'.encode())
         t_start = time.time()
+        print(self.readline())
         while time.time() - t_start < self._int_time * 1.2:
+            # print(f"time: {time.time()}, start: {t_start}, diff: {time.time() - t_start} limit: {self._int_time * 1.2}")
             if self.in_waiting != 0:
                 return int_(self.readline().split())
         print('A timeout occured!\n')

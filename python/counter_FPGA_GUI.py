@@ -1,5 +1,3 @@
-
-
 """
 counter_FPGA_GUI.py is the GUI for continuous counting using the USB counter module
 as a timestamp card.
@@ -22,7 +20,7 @@ import serial.tools.list_ports
 # sets the size of the font for the counters
 ft_size = 42
 # sets the trigger type of input signal, PLEASE CHECK THIS. 'nim' or 'ttl'
-signal_type='ttl'
+signal_type='nim'
 
 
 # Stop querying the timestamp function, close device and initiate selected device in pairs mode.
@@ -199,7 +197,7 @@ line5, = ax.plot(xar, c100_yar)
 line6, = ax.plot(xar, c101_yar)
 line7, = ax.plot(xar, c102_yar)
 line8, = ax.plot(xar, c103_yar)
-fig.legend(['C1', 'C2', 'C3', 'C4','P13','P14','P23','P24'], loc='upper right')
+fig.legend(['N1', 'N2', 'N3', 'N4','N13','N14','N23','N24'], loc='upper right')
 fig.suptitle('Counts (TTL) vs Current Time')
 ax.set_xlabel('Time')
 ax.set_ylabel('Counts')
@@ -219,7 +217,7 @@ ttk.Button(mainframe, text="Init Device", command=InitDevice).grid(
 time_entry = Spinbox(mainframe, width=7, from_=0.1, to=5,
                      increment=.1, textvariable=timer_00)
 time_entry.grid(column=5, row=6, sticky=(W, E))
-timer_00.set(400)
+timer_00.set(1000)
 print(timer_00.get())
 
 # title
@@ -244,7 +242,7 @@ ttk.Label(mainframe, text='Pair C2-C3',
           font=("Helvetica", 28)).grid(column=3, row=4, sticky=(W, E))
 ttk.Label(mainframe, text='Pair C2-C4',
           font=("Helvetica", 28)).grid(column=3, row=5, sticky=(W, E))
-ttk.Label(mainframe, text='Gate Time / ms',
+ttk.Label(mainframe, text='Gate Time (ms)',
           font=("Helvetica", 12)).grid(column=4, row=6, sticky=(E))
 ttk.Label(mainframe, text='Select Device',
           font=("Helvetica", 12)).grid(column=1, row=7, sticky=(W))
@@ -279,4 +277,3 @@ root.protocol("WM_DELETE_WINDOW",on_closing)
 
 # finally we run it!
 root.mainloop()
-

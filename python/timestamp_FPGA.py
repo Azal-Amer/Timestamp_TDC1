@@ -23,7 +23,7 @@ import matplotlib.animation as animation
 # sets the size of the font for the counters
 ft_size = 42
 # sets the trigger type of input signal, PLEASE CHECK THIS. 'nim' or 'ttl'
-signal_type='ttl'
+signal_type='nim'
 
 # Lists for stored timestamped events.
 pattern_loop = []
@@ -209,7 +209,7 @@ Maxbin_00 = IntVar()
 time_entry = Spinbox(mainframe, width=7, from_=0.1, to=5,
                      increment=.1, textvariable=timer_00)
 time_entry.grid(column=1, row=8, sticky=(W))
-timer_00.set(400)
+timer_00.set(1000)
 print(timer_00.get())
 
 # controls: Coincidence Window
@@ -250,11 +250,11 @@ counter_ef2 = StringVar()
 counter_ef2.set(format(0))
 
 # labels
-ttk.Label(mainframe, text='Gate Time /ms',
+ttk.Label(mainframe, text='Gate Time (ms)',
           font=("Helvetica", 8)).grid(column=1, row=9, sticky=(W))
-ttk.Label(mainframe, text='Coincidence Window /ns',
+ttk.Label(mainframe, text='Coincidence Window (ns)',
           font=("Helvetica", 8)).grid(column=2, row=9, sticky=(W))
-ttk.Label(mainframe, text='Binwidth /ns',
+ttk.Label(mainframe, text='Binwidth (ns)',
           font=("Helvetica", 8)).grid(column=3, row=9, sticky=(W))
 ttk.Label(mainframe, text='Maxbins',
           font=("Helvetica", 8)).grid(column=4, row=9, sticky=(W))
@@ -290,9 +290,9 @@ line2, = ax.plot(xar, c01_yar, color='green')
 line3, = ax2.plot(xar, c12_yar, color='red', linestyle = '--')
 box = ax.get_position()
 ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-fig.legend(['C1', 'C2', 'C12'], loc='upper right', bbox_to_anchor = [1.0, 1])
+fig.legend(['N1', 'N2', 'N12'], loc='upper right', bbox_to_anchor = [1.0, 1])
 fig.suptitle('Counts (TTL) vs Current Time')
-ax.set_xlabel('Time / ms')
+ax.set_xlabel('Time (ms)')
 ax.set_ylabel('Counts')
 ax.grid(True)
 ani = animation.FuncAnimation(fig, animate, interval=100, blit=False)

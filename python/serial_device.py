@@ -25,12 +25,12 @@ class SerialDevice(serial.Serial):
         It requires the full path to the serial device as arguments
         """
         try:
-            serial.Serial.__init__(self, device_path, timeout)
-            self.timeout = timeout
-            self.baudrate = 115200
-            self.stopbits = serial.STOPBITS_ONE
-            self.bytesize = serial.EIGHTBITS
-            self.parity = serial.PARITY_NONE
+            serial.Serial.__init__(self, device_path, 
+            timeout = timeout,
+            baudrate = 115200,
+            stopbits = serial.STOPBITS_ONE,
+            bytesize = serial.EIGHTBITS,
+            parity = serial.PARITY_NONE)
             self._reset_buffers()
         except SerialException:
             print('Connection failed')
