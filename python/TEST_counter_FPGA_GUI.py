@@ -33,8 +33,10 @@ col3 = "V"
 list1 = []
 list2 = []
 list3 = []
+# append the current dateAndTime TODO
+runcount = 0 
 file = "exporteddata.csv"
-
+printing = True
 # Stop querying the timestamp function, close device and initiate selected device in pairs mode.
 def InitDevice(*args):
     loop_flag.set(False)
@@ -59,13 +61,20 @@ def change_counter_f(*args):
 
 # Function to start the counter.
 def start_f(*args):
+    try:
+        runcount+=1
+    except Exception as e:  
+        print(e)
+        runcount = 0
+
     loop_flag.set(True)
     counter_100.set(0)
     counter_101.set(0)
     counter_102.set(0)
     while loop_flag.get():
         counter_value=counter.counts
-        print(counter_value)
+        if printing == True:
+            print(counter_value)
         counter_00.set('{:6.1f}'.format(counter_value[0]))
         counter_01.set('{:6.1f}'.format(counter_value[1]))
         counter_02.set('{:6.1f}'.format(counter_value[2]))
@@ -94,6 +103,7 @@ def snapshot(*args):
     list3.append(counter_01.get())
 
 def export(*args):
+    file = f"exporteddata{runcount}.csv"
     with open(file, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow([col1, col2, col3])
@@ -179,7 +189,8 @@ addresslist = []
 for port in portslist:
     devicelist.append(port.device + " " + port.description)
     addresslist.append(port.device)
-print(devicelist)
+if printing == True:
+    print(devicelist)
 set_ports = StringVar(mainframe)
 ports_option = ttk.OptionMenu(mainframe, set_ports, devicelist, *devicelist)
 ports_option.grid(row=7, padx=2, pady=5, column=2)
@@ -248,7 +259,8 @@ angle_entry = Spinbox(mainframe, width=7, from_=0, to=360, increment=1, textvari
 angle_entry.grid(column=5, row=7, sticky=(W, E))
 time_entry.grid(column=2, row=6, sticky=(W, E))
 timer_00.set(1000)
-print(timer_00.get())
+if printing == True:
+    print(timer_00.get())
 
 # title
 ttk.Label(mainframe, text='Counting Rate',
