@@ -36,20 +36,44 @@ list3 = []
 # append the current dateAndTime TODO
 runcount = 0 
 file = "exporteddata.csv"
-printing = True
+printing = False
 counter1State = False
+averageStart = False
+averageStarttime = 0
+averageEndTime = 0
+def find_closest_index(arr,target):
+    left = 0
+    right = len(arr)-1
+
+    while left<= right:
+        mid = (left+right)//2
+        if arr[mid]==target:
+            return mid
+        elif arr[mid]<target:
+            left = mid+1
+        else:
+            right = mid-1
+    if left == 0:
+        return 0
+    if right == len(arr)-1:
+        return right
+    if target - arr[right]<arr[left]-target:
+        return right
+    else:
+        return left
 # Stop querying the timestamp function, close device and initiate selected device in pairs mode.
 def InitDevice(*args):
+
     loop_flag.set(False)
     started = 1
     deviceAddress = ''
     for idx, device in enumerate(devicelist):
         if set_ports.get() == device:
             deviceAddress = addresslist[idx]
-    print("SelectedPort " + deviceAddress)
+    # print("SelectedPort " + deviceAddress)
     counter.startport(deviceAddress)
     counter.mode = 'pairs'
-    print(set_ports.get(), "ready to go.")
+    # print(set_ports.get(), "ready to go.")
 
 def on_closing():
     counter.closeport()
@@ -111,6 +135,39 @@ def export(*args):
         for one, two, three in zip(list1, list2, list3):
             writer.writerow([one, two, three])
 # Creates a graph for the GUI.
+def average(*args):
+    currentTime = int(round(time.time() * 1000))
+    global averageStart;
+    global averageStarttime;
+    global averageEndTime;
+    try:
+        if(averageStart==False): 
+            averageStart = True
+            averageCounter.set("loading...")
+            averageStarttime = currentTime
+            # when the case is true, mark the time that it is in the array
+            print(averageStart)
+        elif(averageStart==True): 
+            
+            averageStart = False
+
+            averageEndTime = currentTime
+            print(f"gap between clicks was {(averageEndTime-averageStarttime)/1000} secs")
+            print(f"your times were {averageEndTime} and {averageStarttime}")
+            # then we want to find the values of c02_yar within that range, and average them
+            # find the indicies of xar that match the times, and print them
+            start_index = find_closest_index(xar,averageStarttime)
+            end_index = find_closest_index(xar,averageEndTime)
+            print(f"The indicies of xar with those times are start at {start_index} and {end_index}")
+            print('-----------------')
+            # then we want to, given an array and some indecies
+            averageValue = sum(c01_yar[start_index:end_index])/(end_index-start_index)
+            averageCounter.set(round(averageValue,0))
+
+    except Exception as e:  
+        print(e)
+        averageStart = True
+        
 fig = plt.Figure(figsize=[9.4, 4.8])
 
 # Initialize the counter value array for displayed graph.
@@ -125,6 +182,7 @@ c102_yar = [0]
 c103_yar = [0]
 
 # Updates the graphs with new values, resizes the axes every loop. The x-axis is the UTC time in milliseconds since the epoch.
+
 def animate(i):
     xar.append(int(round(time.time() * 1000)))
     if counter1State==True:
@@ -148,8 +206,8 @@ def animate(i):
         c101_yar.pop(0)
         c102_yar.pop(0)
         c103_yar.pop(0)
-    axes = fig.gca()
-    axes.set_xlim([max(xar)-5000, max(xar)+5000])
+    axes = fig.gca() 
+    axes.set_xlim([max(xar)-10000, max(xar)+10000])
     max_values = [max(c00_yar),max(c01_yar),max(c02_yar),max(c03_yar),max(c100_yar),max(c101_yar),max(c102_yar),max(c103_yar)]
     axes.set_ylim([1, max(max_values)+10])
 
@@ -219,7 +277,8 @@ counter_102 = StringVar()
 counter_102.set(format(0))
 counter_103 = StringVar()
 counter_103.set(format(0))
-
+averageCounter = StringVar()
+averageCounter.set(format(0))
 timer_00 = StringVar()
 angle = StringVar()
 
@@ -256,6 +315,8 @@ ttk.Button(mainframe, text="Snapshot", command=snapshot).grid(
     column=5, row=1, sticky=W)
 ttk.Button(mainframe, text='Export', command=export).grid(
     column=5, row=2, sticky=W)
+ttk.Button(mainframe,text='Average', command=average).grid(
+    column=6, row=1, sticky=W)
 # controls
 time_entry = Spinbox(mainframe, width=7, from_=0.1, to=5,
                      increment=.1, textvariable=timer_00)
@@ -316,6 +377,8 @@ ttk.Label(mainframe, textvariable=counter_102, width=7, anchor=E,
           font=("Helvetica", ft_size)).grid(column=4, row=4, sticky=(W, E))
 ttk.Label(mainframe, textvariable=counter_103, anchor=E,
           font=("Helvetica", ft_size)).grid(column=4, row=5, sticky=(W, E))
+ttk.Label(mainframe, textvariable=averageCounter, anchor=E,
+          font=("Helvetica", ft_size)).grid(column=7, row=1, sticky=(W, E))
 
 
 # padding the space surrounding all the widgets
