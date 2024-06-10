@@ -34,13 +34,14 @@ list1 = []
 list2 = []
 list3 = []
 # append the current dateAndTime TODO
-runcount = 0 
 file = "exporteddata.csv"
 printing = False
-counter1State = False
+counter1State = True
 averageStart = False
+numberOfDetectors=[1,2]
 averageStarttime = 0
 averageEndTime = 0
+
 def find_closest_index(arr,target):
     left = 0
     right = len(arr)-1
@@ -86,11 +87,8 @@ def change_counter_f(*args):
 
 # Function to start the counter.
 def start_f(*args):
-    try:
-        runcount+=1
-    except Exception as e:  
-        print(e)
-        runcount = 0
+
+
 
     loop_flag.set(True)
     counter_100.set(0)
@@ -128,14 +126,14 @@ def snapshot(*args):
     list3.append(counter_01.get())
 
 def export(*args):
-    file = f"exporteddata{runcount}.csv"
+    file = f"exporteddata.csv"
     with open(file, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow([col1, col2, col3])
         for one, two, three in zip(list1, list2, list3):
             writer.writerow([one, two, three])
 # Creates a graph for the GUI.
-def average(*args):
+def analyze(*args):
     currentTime = int(round(time.time() * 1000))
     global averageStart;
     global averageStarttime;
@@ -143,12 +141,17 @@ def average(*args):
     try:
         if(averageStart==False): 
             averageStart = True
-            averageCounter.set("loading...")
+
+            for i in range(len(numberOfDetectors)):
+                # the relevant variable is going to be named f"c0{numberOfDetectors[i]-1}_yar"
+
+                averageCounterList[i].set("loading...")
+                rangeCounterList[i].set("loading...")
             averageStarttime = currentTime
             # when the case is true, mark the time that it is in the array
             print(averageStart)
         elif(averageStart==True): 
-            
+            datas = [c00_yar,c01_yar,c02_yar,c03_yar]
             averageStart = False
 
             averageEndTime = currentTime
@@ -161,11 +164,20 @@ def average(*args):
             print(f"The indicies of xar with those times are start at {start_index} and {end_index}")
             print('-----------------')
             # then we want to, given an array and some indecies
-            averageValue = sum(c01_yar[start_index:end_index])/(end_index-start_index)
-            averageCounter.set(round(averageValue,0))
+
+            for i in range(len(numberOfDetectors)):
+                data = datas[numberOfDetectors[i]-1]
+                print(f"c0{numberOfDetectors[i]-1}_yar")
+                # the relevant variable is going to be named f"c0{numberOfDetectors[i]-1}_yar"
+                    
+                averageValue = sum(data[start_index:end_index])/(end_index-start_index)
+                rangeData = max(data[start_index:end_index])-min(data[start_index:end_index])
+                averageCounterList[i].set(round(averageValue,0))
+                rangeCounterList[i].set(round(rangeData,0))
 
     except Exception as e:  
         print(e)
+        print("ERRORRRR")
         averageStart = True
         
 fig = plt.Figure(figsize=[9.4, 4.8])
@@ -227,7 +239,11 @@ def animate(i):
     line7.set_ydata(c102_yar)  # update the data
     line8.set_xdata(xar)
     line8.set_ydata(c103_yar)  # update the data
-    return line1, line2, line3, line4, line5, line6, line7, line8
+    if(averageStart== True):
+        line9.set_xdata(averageStarttime)
+        ax.axvspan(xmin =xar[-2], xmax = xar[-1],color = "red",alpha = .25 )
+
+    return line1, line2, line3, line4, line5, line6, line7, line8,line9
 
 
 
@@ -277,8 +293,23 @@ counter_102 = StringVar()
 counter_102.set(format(0))
 counter_103 = StringVar()
 counter_103.set(format(0))
+
+averageCounterList = []
+for i in range(len(numberOfDetectors)):
+    averageCounterList.append(StringVar())
+    averageCounterList[i].set(format(0))
+
+rangeCounterList = []
+for i in range(len(numberOfDetectors)):
+    rangeCounterList.append(StringVar())
+    rangeCounterList[i].set(format(0))
+
+    
 averageCounter = StringVar()
 averageCounter.set(format(0))
+rangeCounter = StringVar()
+rangeCounter.set(format(0))
+
 timer_00 = StringVar()
 angle = StringVar()
 
@@ -295,6 +326,8 @@ line5, = ax.plot(xar, c100_yar)
 line6, = ax.plot(xar, c101_yar)
 line7, = ax.plot(xar, c102_yar)
 line8, = ax.plot(xar, c103_yar)
+line9= ax.axvline(x=averageStarttime,color = 'red', linewidth = 5,alpha = .5)
+
 fig.legend(['C1', 'C2', 'C3', 'C4','P13','P14','P23','P24'], loc='upper right')
 fig.suptitle('Counts (TTL) vs Current Time')
 ax.set_xlabel('Time')
@@ -315,7 +348,7 @@ ttk.Button(mainframe, text="Snapshot", command=snapshot).grid(
     column=5, row=1, sticky=W)
 ttk.Button(mainframe, text='Export', command=export).grid(
     column=5, row=2, sticky=W)
-ttk.Button(mainframe,text='Average', command=average).grid(
+ttk.Button(mainframe,text='Analyze Interval Data', command=analyze).grid(
     column=6, row=1, sticky=W)
 # controls
 time_entry = Spinbox(mainframe, width=7, from_=0.1, to=5,
@@ -357,7 +390,17 @@ ttk.Label(mainframe, text='Select Device',
 ttk.Label(mainframe, text='Angle',
           font=("Helvetica", 12)).grid(column=4, row=7)
 
-
+ttk.Label(mainframe, text='Average',
+          font=("Helvetica", 12)).grid(column=7, row=1)
+ttk.Label(mainframe, text='Range',
+          font=("Helvetica", 12)).grid(column=7, row=2)
+for i in range(len(numberOfDetectors)):
+        print(numberOfDetectors[i]-1)
+        print(averageCounterList)
+        ttk.Label(mainframe, text=f"Average {numberOfDetectors[i]}",
+            font=("Helvetica", ft_size)).grid(column=7, row=1+2*i)
+        ttk.Label(mainframe, text=f"Range {numberOfDetectors[i]}",
+            font=("Helvetica", ft_size)).grid(column=7, row=2+2*i)
 
 # outputs
 ttk.Label(mainframe, textvariable=counter_00, width=7, anchor=E,
@@ -377,8 +420,20 @@ ttk.Label(mainframe, textvariable=counter_102, width=7, anchor=E,
           font=("Helvetica", ft_size)).grid(column=4, row=4, sticky=(W, E))
 ttk.Label(mainframe, textvariable=counter_103, anchor=E,
           font=("Helvetica", ft_size)).grid(column=4, row=5, sticky=(W, E))
+
+
 ttk.Label(mainframe, textvariable=averageCounter, anchor=E,
-          font=("Helvetica", ft_size)).grid(column=7, row=1, sticky=(W, E))
+          font=("Helvetica", ft_size)).grid(column=8, row=1, sticky=(W, E))
+ttk.Label(mainframe, textvariable=rangeCounter, anchor=E,
+          font=("Helvetica", ft_size)).grid(column=8, row=2, sticky=(W, E))
+for i in range(len(numberOfDetectors)):
+        print(numberOfDetectors[i]-1)
+        print(averageCounterList)
+
+        ttk.Label(mainframe, textvariable=averageCounterList[numberOfDetectors[i]-1], anchor=E,
+            font=("Helvetica", ft_size)).grid(column=8, row=1+2*i, sticky=(W, E))
+        ttk.Label(mainframe, textvariable=rangeCounterList[numberOfDetectors[i]-1], anchor=E,
+            font=("Helvetica", ft_size)).grid(column=8, row=2+2*i, sticky=(W, E))
 
 
 # padding the space surrounding all the widgets
