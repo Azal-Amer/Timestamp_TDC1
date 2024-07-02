@@ -41,7 +41,9 @@ averageStart = False
 numberOfDetectors=[1,2]
 averageStarttime = 0
 averageEndTime = 0
-
+correctiveRatio = 1
+correctiveRatio = ((7.2/7.7)**-1)*(7.7/8)
+print(correctiveRatio)
 def find_closest_index(arr,target):
     left = 0
     right = len(arr)-1
@@ -68,10 +70,12 @@ def InitDevice(*args):
     loop_flag.set(False)
     started = 1
     deviceAddress = ''
+    deviceAddress = addresslist[0]
     for idx, device in enumerate(devicelist):
         if set_ports.get() == device:
             deviceAddress = addresslist[idx]
-    # print("SelectedPort " + deviceAddress)
+            print("SelectedPort " + deviceAddress)
+    
     counter.startport(deviceAddress)
     counter.mode = 'pairs'
     # print(set_ports.get(), "ready to go.")
@@ -98,7 +102,7 @@ def start_f(*args):
         counter_value=counter.counts
         if printing == True:
             print(counter_value)
-        counter_00.set('{:6.1f}'.format(counter_value[0]))
+        counter_00.set('{:6.1f}'.format(counter_value[0])) #I removed the correctiveRatio (plz don't skin me alive)
         counter_01.set('{:6.1f}'.format(counter_value[1]))
         counter_02.set('{:6.1f}'.format(counter_value[2]))
         counter_03.set('{:6.1f}'.format(counter_value[3]))
@@ -198,7 +202,7 @@ c103_yar = [0]
 def animate(i):
     xar.append(int(round(time.time() * 1000)))
     if counter1State==True:
-        c00_yar.append(float(counter_00.get()))
+        c00_yar.append((float(counter_00.get())))
     else:
         c00_yar.append(0)
     c01_yar.append(float(counter_01.get()))
@@ -208,7 +212,7 @@ def animate(i):
     c101_yar.append(float(counter_101.get()))
     c102_yar.append(float(counter_102.get()))
     c103_yar.append(float(counter_103.get()))
-    if max(xar) - xar[0] > 5000:
+    if max(xar) - xar[0] > 15000:
         xar.pop(0)
         c00_yar.pop(0)
         c01_yar.pop(0)
@@ -219,7 +223,7 @@ def animate(i):
         c102_yar.pop(0)
         c103_yar.pop(0)
     axes = fig.gca() 
-    axes.set_xlim([max(xar)-10000, max(xar)+10000])
+    axes.set_xlim([max(xar)-20000, max(xar)+1000])
     max_values = [max(c00_yar),max(c01_yar),max(c02_yar),max(c03_yar),max(c100_yar),max(c101_yar),max(c102_yar),max(c103_yar)]
     axes.set_ylim([1, max(max_values)+10])
 
@@ -241,7 +245,7 @@ def animate(i):
     line8.set_ydata(c103_yar)  # update the data
     if(averageStart== True):
         line9.set_xdata(averageStarttime)
-        ax.axvspan(xmin =xar[-2], xmax = xar[-1],color = "red",alpha = .25 )
+        ax.axvspan(xmin =xar[-2]+40, xmax = xar[-1],color = "red",alpha = .25 )
 
     return line1, line2, line3, line4, line5, line6, line7, line8,line9
 
@@ -267,6 +271,9 @@ addresslist = []
 for port in portslist:
     devicelist.append(port.device + " " + port.description)
     addresslist.append(port.device)
+devicelist=devicelist[::-1]
+portslist=portslist[::-1]
+addresslist=addresslist[::-1]
 if printing == True:
     print(devicelist)
 set_ports = StringVar(mainframe)
@@ -277,6 +284,7 @@ loop_flag = BooleanVar()
 loop_flag.set(False)
 
 # String Variables used
+
 counter_00 = StringVar()
 counter_00.set(format(0))
 counter_01 = StringVar()
