@@ -60,10 +60,12 @@ def change_snap_f(*args):
     Counter.extend(histogram)
     table = zip(pattern, timestamp)
     with open(timepath, 'w') as csvFile:
+        print(f'Writing to file {timepath}')
         writer = csv.writer(csvFile, delimiter=' ')
         writer.writerows(table)
         csvFile.close()
     with open(histopath, 'w') as csvFile:
+        print(f'Writing to file {histopath}')
         writer = csv.writer(csvFile, delimiter=' ')
         writer.writerow(Counter)
         csvFile.close()

@@ -91,9 +91,6 @@ def change_counter_f(*args):
 
 # Function to start the counter.
 def start_f(*args):
-
-
-
     loop_flag.set(True)
     counter_100.set(0)
     counter_101.set(0)
@@ -132,10 +129,13 @@ def snapshot(*args):
 def export(*args):
     print('guys im like exporting the data now lmao')
     file = f"exporteddata.csv"
+    print([col1, col2, col3])
+    # make the file if it doesn't exist
     with open(file, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow([col1, col2, col3])
         for one, two, three in zip(list1, list2, list3):
+
             writer.writerow([one, two, three])
 # Creates a graph for the GUI.
 def analyze(*args):
