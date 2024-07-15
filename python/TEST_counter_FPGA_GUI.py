@@ -130,6 +130,7 @@ def snapshot(*args):
     list3.append(counter_01.get())
 
 def export(*args):
+    print('guys im like exporting the data now lmao')
     file = f"exporteddata.csv"
     with open(file, 'w', newline='') as f:
         writer = csv.writer(f)
@@ -175,7 +176,8 @@ def analyze(*args):
                 # the relevant variable is going to be named f"c0{numberOfDetectors[i]-1}_yar"
                     
                 averageValue = sum(data[start_index:end_index])/(end_index-start_index)
-                rangeData = max(data[start_index:end_index])-min(data[start_index:end_index])
+                # rangeData = max(data[start_index:end_index])-min(data[start_index:end_index])
+                rangeData = np.std(data[start_index:end_index])
                 averageCounterList[i].set(round(averageValue,0))
                 rangeCounterList[i].set(round(rangeData,0))
 
@@ -407,7 +409,7 @@ for i in range(len(numberOfDetectors)):
         print(averageCounterList)
         ttk.Label(mainframe, text=f"Average {numberOfDetectors[i]}",
             font=("Helvetica", ft_size)).grid(column=7, row=1+2*i)
-        ttk.Label(mainframe, text=f"Range {numberOfDetectors[i]}",
+        ttk.Label(mainframe, text=f"STD {numberOfDetectors[i]}",
             font=("Helvetica", ft_size)).grid(column=7, row=2+2*i)
 
 # outputs

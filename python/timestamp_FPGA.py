@@ -51,7 +51,7 @@ def SetSave(*args):
 # single shot timestamp within integration time.
 def change_snap_f(*args):
     loop_flag.set(True)
-    print("Set Integration time:" + timer_00.get() + "ms")
+    print("Set Integration time:" + str(timer_00.get()) + "ms")
     [timestamp,pattern] = counter.timestamp_acq_python(timer_00.get(),signal_type)
     [hist, histN, cnt1, cnt2, coincidence, binwidth, maxbins] = counter.g2(timestamp, pattern, CoincidenceWindow_00.get(),binwidth_00.get(),Maxbin_00.get())
     print("CH1 Count " +str(cnt1) + " /// CH2 Count " + str(cnt2))
