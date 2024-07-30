@@ -5,7 +5,6 @@ HBT.ipynb
 *.ipynb
 python/.DS_Store
 .DS_Store
-*.dat
-*.dat
+
 python/Timeevents.dat
 python/Timeevents.dat
